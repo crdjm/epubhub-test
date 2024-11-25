@@ -1,8 +1,8 @@
 import { parseEpub } from "epubhub";
 const fs = require("fs");
 
-const input = "/Users/crdjm/Desktop/epubs/input_epubs/local/mobydick.epub";
-const output = "/Users/crdjm/Desktop/epubs/input_epubs/mobydick_updated.epub";
+const input = "./input/mobydick.epub";
+const output = "./output/mobydick_updated.epub";
 
 let writeFileSync = function (path: string, buffer: any) {
   const permission = 438;
