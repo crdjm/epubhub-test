@@ -16,27 +16,40 @@
 //
 //
 
-import { parseEpub } from "epubhub";
+import { parseEpub, Epub } from "epubhub";
 
 import { writeFileSync } from "./utils";
 
-const input = "./input/mobydick.epub";
-const output = "./output/mobydick_updated.epub";
+const moby = "./input/mobydick.epub";
+const mobyOut = "./output/mobydick_updated.epub";
 
-async function updateEpub() {
-  const epub = await parseEpub(input);
-
-  const entry = epub.spine[0];
-  const txt = await entry.item.getText();
-  const updated = txt.replace(/\<title\>/g, "<title>INSERTED ");
-
-  await entry.item.setText(updated);
-
-  const buf = await epub.toBuffer();
-  writeFileSync(output, buf);
+// Extract and display the metadata from the epub in a more readable format
+// than the raw XML found in the epub
+async function displayMetadata(epub: Epub) {
+  const meta = epub.metadata;
+  console.dir(meta, { depth: null });
 }
 
-updateEpub();
+// Simple example of updating the content of a an epub and re-saving
+// Clearly any real usage would make a more meaningful change.
+async function updateEpub(epub: Epub, output: string) {
+  const entry = epub.spine[0]; // Get the first file -- just need any content to update
+  const txt = await entry.item.getText();
+  const updated = txt.replace(/\<title\>/g, "<title>ADDED FOR TESTING "); // As noted, somewhat meaningless change
+
+  await entry.item.setText(updated); // Update the file in our internal epub
+
+  const buf = await epub.toBuffer(); // Convert to a format we can write to disk
+  writeFileSync(output, buf); // Write the updated epub to disk
+}
+
+async function runTests() {
+  const mobyEpub: Epub = await parseEpub(moby);
+  displayMetadata(mobyEpub);
+  updateEpub(mobyEpub, mobyOut);
+}
+
+runTests();
 
 // Possible examples...
 // Extra metadata
