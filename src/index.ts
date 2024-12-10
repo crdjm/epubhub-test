@@ -27,10 +27,20 @@ const mobyOut = "./output/mobydick_updated.epub";
 // than the raw XML found in the epub
 async function displayMetadata(epub: Epub) {
   const meta = epub.metadata;
-  console.dir(meta, { depth: null });
+  console.log("Original metadata:");
+  //  console.dir(meta, { depth: null }); // Omit while testing other output
 }
 
-// Simple example of updating the content of a an epub and re-saving
+async function displayChapterFiles(epub: Epub) {
+  const spine = epub.spine;
+  console.log("Epub spine:");
+
+  for (const page of spine) {
+    console.log(page.item.href);
+  }
+}
+
+// Simple example of updating the content of an epub and re-saving
 // Clearly any real usage would make a more meaningful change.
 async function updateEpub(epub: Epub, output: string) {
   const entry = epub.spine[0]; // Get the first file -- just need any content to update
@@ -39,6 +49,11 @@ async function updateEpub(epub: Epub, output: string) {
 
   await entry.item.setText(updated); // Update the file in our internal epub
 
+  // Also update the metadata, again in the internal representation for now
+  const meta = epub.metadata;
+  meta["dc:rights"] = "All rights reserved...";
+  epub.updateMetadata();
+
   const buf = await epub.toBuffer(); // Convert to a format we can write to disk
   writeFileSync(output, buf); // Write the updated epub to disk
 }
@@ -46,6 +61,7 @@ async function updateEpub(epub: Epub, output: string) {
 async function runTests() {
   const mobyEpub: Epub = await parseEpub(moby);
   displayMetadata(mobyEpub);
+  displayChapterFiles(mobyEpub);
   updateEpub(mobyEpub, mobyOut);
 }
 
